@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>The Wall</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <div class="container">
+        <div class="row sticky-top p-2 bg-primary text-white" >
+            <div class="col">
+                    <h2>CodingDojo Wall</h2>
+            </div>
+            <div class="col">
+                <p class="text-right">
+                    Welcome {{request.session.loggedInUser_name}}
+                    <a href="/logout">Log off</a>
+                </p>
+            </div>
+        </div>
+        <div class="m-5">
+            <form action="/wall/post" method="POST">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="message">Post a message</label>
+                    <textarea name="message" class="form-control" placeholder="How are you feeling today..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Post a message</button>
+            </form>
+        </div>
+        <div>
+            {% for message in messages %}
+                <p class="mt-2 text-primary">{{message.poster.first_name}} {{message.poster.last_name}} - {{message.created_at}}</p>
+                <p class="bg-light border rounded d-inline-block p-2">{{message.message}}</p>
+                {% for comment in message.comments.all %}
+                    <p class="text-primary">{{comment.poster.first_name}} {{comment.poster.last_name}} {{comment.updated_at}}</p> 
+                    <p class="bg-light border rounded d-inline-block p-2">{{comment.comment}}</p>
+                {% endfor %}
+                <form action="/wall/post_comment/{{message.id}}" method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="comment">Post a comment</label>
+                        <textarea name="comment" class="form-control"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post a comment</button>
+                </form>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>
